@@ -1,6 +1,6 @@
 # immimaps: United States immigration statistics on map
 
-This repository contains a Python package that can be used to visualize United States immigration statistics on U.S. and world maps.
+This repository contains a Python package that can be used to visualize United States immigration statistics on U.S. (and later, world) maps.
 Currently, only PERM data is supported.
 PERM data refers to employer-sponsored applications for lawful permanent resident, also known as employment-based green card applications.
 
@@ -34,4 +34,26 @@ This will create a pickle file `data/dol_perm/perm.pkl` which will contain the m
 Applications that are denied or withdrawn are excluded from this file.
 The preprocessing step will also output several intermediate files that may or may not be of interest.
 
-Map drawing functionalities will be added soon...
+## Example
+As an example, we can show the percentages of new immigrants that hold a doctoral degree in different U.S. states.
+A simplified Python code would look like this:
+```python
+import pandas as pd
+import immimaps.cartography
+
+datafile = '/path/to/perm.pkl'
+data = pd.read_pickle(datafile)
+
+doctorate_ratio = data.groupby('job_state')['worker_education_level'].\
+    apply(lambda x: 100 * (x=='DOCTORATE').sum() / x.count())
+
+ax, sm = immimaps.cartography.draw_us_map(doctorate_ratio.to_dict())
+# add title etc...
+
+plt.show()
+```
+
+The output would look similar to this:
+[![Doctoral degree percentages by state](/doc/doctor_ratios.png)](/doc/doctor_ratios.png)
+
+A full example script is available in the `examples` subfolder.
